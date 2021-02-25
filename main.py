@@ -1,16 +1,16 @@
-import os
 import sys
 import pygame as pg
 from io import BytesIO
 import requests
 
+from button import Button
 
 
 def get_image(coords, scale: int, map_type: str):
     basic = 'https://static-maps.yandex.ru/1.x/?'
     response = requests.get(basic, params={'ll': ','.join(map(str, coords)),
                                            'z': scale,
-                                           'l': 'sat'})
+                                           'l': map_type})
     if not response:
         print("Ошибка выполнения запроса:")
         print("Http статус:", response.status_code, "(", response.reason, ")")
@@ -43,15 +43,15 @@ def main():
                     options = translate[event.key]
                     for i in range(len(options)):
                         coords[i] += options[i]
-                    img = pg.image.load(get_image(coords, zoom))
+                    img = pg.image.load(get_image(coords, zoom, button.get_text()))
                 elif event.key == pg.K_PAGEUP:
                     if zoom < 22:
                         zoom += 1
-                    img = pg.image.load(get_image(coords, zoom))
+                        img = pg.image.load(get_image(coords, zoom, button.get_text()))
                 elif event.key == pg.K_PAGEDOWN:
                     if zoom > 2:
                         zoom -= 1
-                    img = pg.image.load(get_image(coords, zoom))
+                        img = pg.image.load(get_image(coords, zoom, button.get_text()))
             if event.type == pg.MOUSEBUTTONDOWN:
                 if button.handle_click(event.pos):
                     button.switch_text()
