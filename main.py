@@ -4,6 +4,7 @@ from io import BytesIO
 import requests
 
 from button import Button
+from textinput import InputBox
 
 
 def get_image(coords, scale: int, map_type: str):
@@ -21,15 +22,19 @@ def get_image(coords, scale: int, map_type: str):
 def main():
     coords = [43.574330, 43.389149]
     zoom = 2
+    map_type = 'map'
+    img = pg.image.load(get_image(coords, zoom, map_type))
     pg.init()
     all_sprites = pg.sprite.Group()
     screen = pg.display.set_mode((600, 450))
+    inputbox = InputBox(395, 0, 140, 32)
     button = Button('схема', (0, 0), (100, 100), all_sprites)
     img = pg.image.load(get_image(coords, zoom, button.get_text()))
     screen.blit(img, (0, 0))
     running = True
+    clock = pg.time.Clock()
+    fps = 60
     while running:
-        screen.fill('black')
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
@@ -58,9 +63,13 @@ def main():
                     button.switch_text()
                     button.draw()
                     img = pg.image.load(get_image(coords, zoom, button.get_text()))
+            inputbox.handle_event(event)
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
+        inputbox.update()
+        inputbox.draw(screen)
         pg.display.flip()
+        clock.tick(fps)
     pg.quit()
 
 
