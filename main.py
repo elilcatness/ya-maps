@@ -1,6 +1,7 @@
 import sys
-import pygame as pg
 from io import BytesIO
+
+import pygame as pg
 import requests
 
 from button import Button
@@ -29,7 +30,8 @@ def main():
     screen = pg.display.set_mode((600, 450))
     inputbox = InputBox(395, 0, 140, 32)
     button = Button('схема', (0, 0), (100, 100), all_sprites)
-    img = pg.image.load(get_image(coords, zoom, button.get_text()))
+    map_type = button.get_text()
+    img = pg.image.load(get_image(coords, zoom, map_type))
     screen.blit(img, (0, 0))
     running = True
     clock = pg.time.Clock()
@@ -49,20 +51,21 @@ def main():
                     options = translate[event.key]
                     for i in range(len(options)):
                         coords[i] += options[i]
-                    img = pg.image.load(get_image(coords, zoom, button.get_text()))
+                    img = pg.image.load(get_image(coords, zoom, map_type))
                 elif event.key == pg.K_PAGEUP:
                     if zoom < 19:
                         zoom += 1
-                        img = pg.image.load(get_image(coords, zoom, button.get_text()))
+                        img = pg.image.load(get_image(coords, zoom, map_type))
                 elif event.key == pg.K_PAGEDOWN:
                     if zoom > 2:
                         zoom -= 1
-                        img = pg.image.load(get_image(coords, zoom, button.get_text()))
+                        img = pg.image.load(get_image(coords, zoom, map_type))
             if event.type == pg.MOUSEBUTTONDOWN:
                 if button.handle_click(event.pos):
                     button.switch_text()
                     button.draw()
-                    img = pg.image.load(get_image(coords, zoom, button.get_text()))
+                    map_type = button.get_text()
+                    img = pg.image.load(get_image(coords, zoom, map_type))
             inputbox.handle_event(event)
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
