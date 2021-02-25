@@ -7,7 +7,7 @@ from button import Button
 
 
 def get_image(coords, scale: int, map_type: str):
-    basic = 'https://static-maps.yandex.ru/1.x/?'
+    basic = 'https://static-maps.yandex.ru/1.x/'
     response = requests.get(basic, params={'ll': ','.join(map(str, coords)),
                                            'z': scale,
                                            'l': map_type})
@@ -21,16 +21,13 @@ def get_image(coords, scale: int, map_type: str):
 def main():
     coords = [43.574330, 43.389149]
     zoom = 2
-    map_type = 'map'
-    img = pg.image.load(get_image(coords, zoom, map_type))
     pg.init()
     all_sprites = pg.sprite.Group()
     screen = pg.display.set_mode((600, 450))
-    screen.blit(img, (0, 0))
     button = Button('схема', (0, 0), (100, 100), all_sprites)
+    img = pg.image.load(get_image(coords, zoom, button.get_text()))
+    screen.blit(img, (0, 0))
     running = True
-    clock = pg.time.Clock()
-    fps = 60
     while running:
         screen.fill('black')
         for event in pg.event.get():
@@ -38,14 +35,18 @@ def main():
                 running = False
             elif event.type == pg.KEYDOWN:
                 if event.key in (pg.K_LEFT, pg.K_RIGHT, pg.K_UP, pg.K_DOWN):
-                    translate = {pg.K_LEFT: (-2, 0), pg.K_RIGHT: (2, 0),
-                                 pg.K_UP: (0, 2), pg.K_DOWN: (0, -2)}
+                    adjustable_sizes = [(range(0, 7), 10 / zoom), (range(7, 10), 1 / zoom),
+                                        (range(10, 14), 0.1 / zoom), (range(14, 18), 0.01 / zoom),
+                                        (range(18, 20), 0.005 / zoom)]
+                    adjust = list(filter(lambda x: zoom in x[0], adjustable_sizes))[0][1]
+                    translate = {pg.K_LEFT: (-1 * adjust, 0), pg.K_RIGHT: (1 * adjust, 0),
+                                 pg.K_UP: (0, 1 * adjust), pg.K_DOWN: (0, -1 * adjust)}
                     options = translate[event.key]
                     for i in range(len(options)):
                         coords[i] += options[i]
                     img = pg.image.load(get_image(coords, zoom, button.get_text()))
                 elif event.key == pg.K_PAGEUP:
-                    if zoom < 22:
+                    if zoom < 19:
                         zoom += 1
                         img = pg.image.load(get_image(coords, zoom, button.get_text()))
                 elif event.key == pg.K_PAGEDOWN:
@@ -57,11 +58,9 @@ def main():
                     button.switch_text()
                     button.draw()
                     img = pg.image.load(get_image(coords, zoom, button.get_text()))
-        img = pg.image.load(get_image(coords, zoom, map_type))
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
         pg.display.flip()
-        clock.tick(fps)
     pg.quit()
 
 
