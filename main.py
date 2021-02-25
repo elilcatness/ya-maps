@@ -1,37 +1,21 @@
-import sys
-from io import BytesIO
-
 import pygame as pg
-import requests
 
+from utils import get_image, extract_coords, get_toponym_scale
 from button import Button
 from textinput import InputBox
-
-
-def get_image(coords, scale: int, map_type: str):
-    basic = 'https://static-maps.yandex.ru/1.x/'
-    response = requests.get(basic, params={'ll': ','.join(map(str, coords)),
-                                           'z': scale,
-                                           'l': map_type})
-    if not response:
-        print("Ошибка выполнения запроса:")
-        print("Http статус:", response.status_code, "(", response.reason, ")")
-        sys.exit(1)
-    return BytesIO(response.content)
 
 
 def main():
     coords = [43.574330, 43.389149]
     zoom = 2
     map_type = 'map'
-    img = pg.image.load(get_image(coords, zoom, map_type))
+    img = pg.image.load(get_image(coords, map_type, zoom))
     pg.init()
     all_sprites = pg.sprite.Group()
     screen = pg.display.set_mode((600, 450))
     inputbox = InputBox(395, 0, 140, 32)
     button = Button('схема', (0, 0), (100, 100), all_sprites)
     map_type = button.get_text()
-    img = pg.image.load(get_image(coords, zoom, map_type))
     screen.blit(img, (0, 0))
     running = True
     clock = pg.time.Clock()
@@ -51,22 +35,31 @@ def main():
                     options = translate[event.key]
                     for i in range(len(options)):
                         coords[i] += options[i]
-                    img = pg.image.load(get_image(coords, zoom, map_type))
+                    img = pg.image.load(get_image(coords, map_type, zoom))
                 elif event.key == pg.K_PAGEUP:
                     if zoom < 19:
                         zoom += 1
-                        img = pg.image.load(get_image(coords, zoom, map_type))
+                        img = pg.image.load(get_image(coords, map_type, zoom))
                 elif event.key == pg.K_PAGEDOWN:
                     if zoom > 2:
                         zoom -= 1
-                        img = pg.image.load(get_image(coords, zoom, map_type))
+                        img = pg.image.load(get_image(coords, map_type, zoom))
             if event.type == pg.MOUSEBUTTONDOWN:
                 if button.handle_click(event.pos):
                     button.switch_text()
                     button.draw()
                     map_type = button.get_text()
-                    img = pg.image.load(get_image(coords, zoom, map_type))
-            inputbox.handle_event(event)
+                    img = pg.image.load(get_image(coords, map_type, zoom))
+            request = inputbox.handle_event(event)
+            if request and isinstance(request, dict):
+                toponym = request
+                coords = extract_coords(toponym)
+                mark = {'coords': ','.join(map(str, coords)),
+                        'type': 'pm2',
+                        'color': 'rd',
+                        'size': 'm'}
+                size = get_toponym_scale(toponym)
+                img = pg.image.load(get_image(coords, map_type, size=size, mark=mark))
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
         inputbox.update()

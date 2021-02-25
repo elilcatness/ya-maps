@@ -1,5 +1,8 @@
 import pygame as pg
 
+from utils import get_geo_object
+from constants import GEOCODE_APIKEY
+
 
 class InputBox:
     def __init__(self, x, y, w, h, text=''):
@@ -20,8 +23,9 @@ class InputBox:
         if event.type == pg.KEYDOWN:
             if self.active:
                 if event.key == pg.K_RETURN:
-                    print(self.text)
+                    toponym = get_geo_object(self.text)
                     self.text = ''
+                    return toponym
                 elif event.key == pg.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:
