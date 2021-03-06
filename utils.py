@@ -46,13 +46,13 @@ def get_geo_object(geocode: str):
 def get_toponym_scale(toponym):
     lower_corner, upper_corner = [float(toponym['boundedBy']['Envelope'][x].split()[0])
                                   for x in ['lowerCorner', 'upperCorner']]
-    size = abs(upper_corner - lower_corner)
-    z_translate = {(200, 250): 1, (150, 199): 2, (100, 149): 3,
-                   (50, 99): 4, (25, 49): 5, (20, 24): 6,
-                   (15, 19): 7, (10, 14): 8, (7, 9): 9,
-                   (4, 7): 10, (2, 3): 11, (1, 1.5): 12,
-                   (0.5, 0.9): 13, (0.25, 0.49): 14, (0.1, 0.24): 15,
-                   (0.05, 0.99): 16, (0.005, 0.049): 17,
+    size = round(abs(upper_corner - lower_corner), ndigits=3)
+    z_translate = {(200, 250): 1, (150, 199.999): 2, (100, 149.999): 3,
+                   (50, 99.999): 4, (25, 49.999): 5, (20, 24.999): 6,
+                   (15, 19.999): 7, (7, 14.999): 8, (5, 6.999): 9,
+                   (4, 4.999): 10, (2, 3.999): 11, (1, 1.999): 12,
+                   (0.5, 0.999): 13, (0.25, 0.499): 14, (0.1, 0.249): 15,
+                   (0.05, 0.999): 16, (0.005, 0.049): 17,
                    (0, 0.0049): 18}
     results = list(filter(lambda x: x[0][0] <= size <= x[0][1], z_translate.items()))
     return results[0][1] if results else None
