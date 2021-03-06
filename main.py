@@ -1,15 +1,13 @@
 import pygame as pg
 
-from utils import get_image, extract_coords, get_toponym_scale
 from button import Button
 from textinput import InputBox
+from utils import get_image, extract_coords, get_toponym_scale
 
 
 def main():
-    coords = [43.574330, 43.389149]
-    zoom = 2
-    map_type = 'map'
-    img = pg.image.load(get_image(coords, map_type, zoom))
+    params = {'coords': [43.574330, 43.389149], 'z': 2, 'map_type': 'map'}
+    img = pg.image.load(get_image(params))
     pg.init()
     all_sprites = pg.sprite.Group()
     screen = pg.display.set_mode((600, 450))
@@ -26,40 +24,40 @@ def main():
                 running = False
             elif event.type == pg.KEYDOWN:
                 if event.key in (pg.K_LEFT, pg.K_RIGHT, pg.K_UP, pg.K_DOWN):
-                    adjustable_sizes = [(range(0, 7), 10 / zoom), (range(7, 10), 1 / zoom),
-                                        (range(10, 14), 0.1 / zoom), (range(14, 18), 0.01 / zoom),
-                                        (range(18, 20), 0.005 / zoom)]
-                    adjust = list(filter(lambda x: zoom in x[0], adjustable_sizes))[0][1]
+                    adjustable_sizes = [(range(0, 7), 10 / params['z']), (range(7, 10), 1 / params['z']),
+                                        (range(10, 14), 0.1 / params['z']), (range(14, 18), 0.01 / params['z']),
+                                        (range(18, 20), 0.005 / params['z'])]
+                    adjust = list(filter(lambda x: params['z'] in x[0], adjustable_sizes))[0][1]
                     translate = {pg.K_LEFT: (-1 * adjust, 0), pg.K_RIGHT: (1 * adjust, 0),
                                  pg.K_UP: (0, 1 * adjust), pg.K_DOWN: (0, -1 * adjust)}
                     options = translate[event.key]
                     for i in range(len(options)):
-                        coords[i] += options[i]
-                    img = pg.image.load(get_image(coords, map_type, zoom))
+                        params['coords'][i] += options[i]
+                    img = pg.image.load(get_image(params))
                 elif event.key == pg.K_PAGEUP:
-                    if zoom < 19:
-                        zoom += 1
-                        img = pg.image.load(get_image(coords, map_type, zoom))
+                    if params['z'] < 19:
+                        params['z'] += 1
+                        img = pg.image.load(get_image(params))
                 elif event.key == pg.K_PAGEDOWN:
-                    if zoom > 2:
-                        zoom -= 1
-                        img = pg.image.load(get_image(coords, map_type, zoom))
+                    if params['z'] > 2:
+                        params['z'] -= 1
+                        img = pg.image.load(get_image(params))
             if event.type == pg.MOUSEBUTTONDOWN:
                 if button.handle_click(event.pos):
                     button.switch_text()
                     button.draw()
-                    map_type = button.get_text()
-                    img = pg.image.load(get_image(coords, map_type, zoom))
+                    params['map_type'] = button.get_text()
+                    img = pg.image.load(get_image(params))
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
                 toponym = request
-                coords = extract_coords(toponym)
-                mark = {'coords': ','.join(map(str, coords)),
-                        'type': 'pm2',
-                        'color': 'rd',
-                        'size': 'm'}
-                size = get_toponym_scale(toponym)
-                img = pg.image.load(get_image(coords, map_type, size=size, mark=mark))
+                params['coords'] = extract_coords(toponym)
+                params['mark'] = {'coords': ','.join(map(str, params['coords'])),
+                                  'type': 'pm2',
+                                  'color': 'rd',
+                                  'size': 'm'}
+                params['z'] = get_toponym_scale(toponym)
+                img = pg.image.load(get_image(params))
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
         inputbox.update()

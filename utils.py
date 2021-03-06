@@ -13,17 +13,14 @@ def request_error(response):
     sys.exit(1)
 
 
-def get_image(coords, map_type, scale=None, size=None, mark=None):
+def get_image(params):
     basic = 'https://static-maps.yandex.ru/1.x/'
-    params = {'ll': ','.join(map(str, coords)),
-              'l': map_type}
-    if scale:
-        params['z'] = scale
-    if mark:
-        params['pt'] = f'{mark["coords"]},{mark["type"]}{mark["color"]}{mark["size"]}'
-    if size:
-        params['spn'] = ','.join(map(str, size))
-    response = requests.get(basic, params=params)
+    request_params = {'ll': ','.join(map(str, params['coords'])),
+                      'l': params['map_type'], 'z': params['z']}
+    if 'mark' in params.keys():
+        mark = params['mark']
+        request_params['pt'] = '%s,%s%s%s' % (mark['coords'], mark['type'], mark['color'], mark['size'])
+    response = requests.get(basic, params=request_params)
     if not response:
         request_error(response)
     return BytesIO(response.content)
@@ -47,10 +44,18 @@ def get_geo_object(geocode: str):
 
 
 def get_toponym_scale(toponym):
-    lower_corner, upper_corner = map(lambda x:
-                                     tuple(map(float, toponym['boundedBy']['Envelope'][x].split())),
-                                     ['lowerCorner', 'upperCorner'])
-    return abs(upper_corner[0] - lower_corner[0]), abs(upper_corner[1] - lower_corner[1])
+    lower_corner, upper_corner = [float(toponym['boundedBy']['Envelope'][x].split()[0])
+                                  for x in ['lowerCorner', 'upperCorner']]
+    size = abs(upper_corner - lower_corner)
+    z_translate = {(200, 250): 1, (150, 199): 2, (100, 149): 3,
+                   (50, 99): 4, (25, 49): 5, (20, 24): 6,
+                   (15, 19): 7, (10, 14): 8, (7, 9): 9,
+                   (4, 7): 10, (2, 3): 11, (1, 1.5): 12,
+                   (0.5, 0.9): 13, (0.25, 0.49): 14, (0.1, 0.24): 15,
+                   (0.05, 0.99): 16, (0.005, 0.049): 17,
+                   (0, 0.0049): 18}
+    results = list(filter(lambda x: x[0][0] <= size <= x[0][1], z_translate.items()))
+    return results[0][1] if results else None
 
 
 def extract_coords(toponym):
