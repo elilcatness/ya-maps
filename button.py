@@ -11,7 +11,7 @@ class Button(pg.sprite.Sprite):
         self.image = None
         pg.font.init()
         self.draw()
-        self.texts = ['Схем', 'Спутник', 'Гибрид']
+        self.texts = ['Схема', 'Спутник', 'Гибрид']
         self.translate = {
             'Схема': 'map',
             'Спутник': 'sat',
