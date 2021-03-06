@@ -1,3 +1,5 @@
+import os
+
 import pygame as pg
 
 from button import Button
@@ -11,8 +13,10 @@ def main():
     pg.init()
     all_sprites = pg.sprite.Group()
     screen = pg.display.set_mode((600, 450))
-    inputbox = InputBox(395, 0, 140, 32)
-    button = Button('схема', (0, 0), (100, 100), all_sprites)
+    pg.display.set_caption('Яндекс.Карты')
+    pg.display.set_icon(pg.image.load(os.path.join('data', 'img', 'yandex.png')))
+    inputbox = InputBox(300, 0, 295, 32)
+    button = Button('Схема', (0, 0), (100, 100), all_sprites)
     map_type = button.get_text()
     screen.blit(img, (0, 0))
     running = True

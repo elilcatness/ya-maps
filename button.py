@@ -11,11 +11,11 @@ class Button(pg.sprite.Sprite):
         self.image = None
         pg.font.init()
         self.draw()
-        self.texts = ['схема', 'спутник', 'гибрид']
+        self.texts = ['Схем', 'Спутник', 'Гибрид']
         self.translate = {
-            'схема': 'map',
-            'спутник': 'sat',
-            'гибрид': 'sat,skl'
+            'Схема': 'map',
+            'Спутник': 'sat',
+            'Гибрид': 'sat,skl'
         }
 
     def switch_text(self):
