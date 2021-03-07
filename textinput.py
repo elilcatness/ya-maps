@@ -7,6 +7,9 @@ class InputBox:
     def __init__(self, x, y, w, h, text='', color='lightskyblue3'):
         self.rect = pg.Rect(x, y, w, h)
         self.width = w
+        self.min_width = w
+        self.min_x = x
+        self.color = pg.Color('lightskyblue3')
         self.color = pg.Color(color)
         self.text = text
         self.font = pg.font.Font(None, 32)
@@ -36,8 +39,22 @@ class InputBox:
                     self.text += event.unicode
                 self.txt_surface = self.font.render(self.text, True, self.color)
 
-    def update(self):
+    def clear(self):
+        self.text = ''
+        self.txt_surface = self.font.render(self.text, True, self.color)
+        self.rect.x = self.min_x
+        self.rect.w = self.min_width
+        self.width = self.min_width
+
+    def update(self, backspace=False):
         width = max(self.width, self.txt_surface.get_width() + 10)
+        if self.width < width:
+            self.rect.x -= width - self.width
+        elif backspace and self.width > self.min_width:
+            if self.rect.x <= self.min_x:
+                self.rect.x += self.txt_surface.get_width() // len(self.text)
+            self.width -= 10
+            # self.rect.x += self.width - self.min_width
         self.rect.w = width
 
     def draw(self, screen):
