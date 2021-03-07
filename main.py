@@ -1,7 +1,6 @@
 import os
 
 import pygame as pg
-
 from button import Button
 from textinput import InputBox
 from utils import get_image, extract_coords, get_toponym_scale
@@ -16,12 +15,14 @@ def main():
     pg.display.set_caption('Яндекс.Карты')
     pg.display.set_icon(pg.image.load(os.path.join('data', 'img', 'yandex.png')))
     inputbox = InputBox(300, 0, 295, 32)
+    inputbox_all_adress = InputBox(5, 415, 295, 32, '', 'dodgerblue2')
     button = Button('Схема', (0, 0), (100, 100), all_sprites)
     map_type = button.get_text()
     screen.blit(img, (0, 0))
     running = True
     clock = pg.time.Clock()
     fps = 60
+    inputboxs = [inputbox, inputbox_all_adress]
     while running:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -55,6 +56,7 @@ def main():
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
                 toponym = request
+                inputbox_all_adress.text_past(toponym['metaDataProperty']['GeocoderMetaData']['text'])
                 params['coords'] = extract_coords(toponym)
                 params['mark'] = {'coords': ','.join(map(str, params['coords'])),
                                   'type': 'pm2',
@@ -64,8 +66,9 @@ def main():
                 img = pg.image.load(get_image(params))
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
-        inputbox.update()
-        inputbox.draw(screen)
+        for inp in inputboxs:
+            inp.update()
+            inp.draw(screen)
         pg.display.flip()
         clock.tick(fps)
     pg.quit()

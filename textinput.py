@@ -4,14 +4,18 @@ from utils import get_geo_object
 
 
 class InputBox:
-    def __init__(self, x, y, w, h, text=''):
+    def __init__(self, x, y, w, h, text='', color='lightskyblue3'):
         self.rect = pg.Rect(x, y, w, h)
         self.width = w
-        self.color = pg.Color('lightskyblue3')
+        self.color = pg.Color(color)
         self.text = text
         self.font = pg.font.Font(None, 32)
         self.txt_surface = self.font.render(text, True, self.color)
         self.active = False
+
+    def text_past(self, text):
+        self.text = text
+        self.txt_surface = self.font.render(self.text, True, self.color)
 
     def handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
