@@ -18,8 +18,7 @@ def main():
     inputbox = InputBox(370, 5, 225, 24, 'left')
     inputbox_all_adress = InputBox(5, 420, 225, 24, 'right', '', 'dodgerblue2')
     button = Button('Схема', (0, 0), (100, 100), all_sprites)
-    map_type = button.get_text()
-    screen.blit(img, (0, 0))
+    clear_button = Button('Сброс', (530, 45), (100, 100), all_sprites)
     running = True
     clock = pg.time.Clock()
     fps = 60
@@ -53,6 +52,12 @@ def main():
                     button.switch_text()
                     button.draw()
                     params['map_type'] = button.get_text()
+                    img = pg.image.load(get_image(params))
+                if clear_button.handle_click(event.pos):
+                    for inp in inputboxs:
+                        inp.clear()
+                    button.draw()
+                    params = {'coords': [43.574330, 43.389149], 'z': 2, 'map_type': 'map'}
                     img = pg.image.load(get_image(params))
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
