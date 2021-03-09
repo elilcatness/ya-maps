@@ -8,6 +8,7 @@ from utils import get_image, extract_coords, get_toponym_scale
 
 def past_all_adress(inputbox_all_adress, toponym, post_index):
     address = toponym['metaDataProperty']['GeocoderMetaData']['text']
+    inputbox_all_adress.clear()
     if post_index:
         try:
             postal_code = \
@@ -37,6 +38,7 @@ def main():
     clock = pg.time.Clock()
     fps = 60
     inputboxs = [inputbox, inputbox_all_adress]
+    last_request = None
     while running:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -75,9 +77,12 @@ def main():
                     img = pg.image.load(get_image(params))
                 if post_button.handle_click(event.pos):
                     post_index = not post_index
+                    if last_request:
+                        past_all_adress(inputbox_all_adress, last_request, post_index)
                     button.draw()
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
+                last_request = request
                 toponym = request
                 past_all_adress(inputbox_all_adress, toponym, post_index)
                 params['coords'] = extract_coords(toponym)
