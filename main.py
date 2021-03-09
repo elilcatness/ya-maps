@@ -9,19 +9,14 @@ from utils import get_image, extract_coords, get_toponym_scale
 
 def main():
     params = {'coords': [43.574330, 43.389149], 'z': 2, 'map_type': 'map'}
-    previous_coords, params_z = None, None
     img = pg.image.load(get_image(params))
     pg.init()
     all_sprites = pg.sprite.Group()
     screen = pg.display.set_mode((600, 450))
     pg.display.set_caption('Яндекс.Карты')
     pg.display.set_icon(pg.image.load(os.path.join('data', 'img', 'yandex.png')))
-    inputbox = InputBox(300, 0, 295, 32)
-    type_button = Button('Схема', (0, 0), (100, 100), all_sprites)
-    map_type = type_button.get_text()
-    clear_button = Button('Сброс поискового результата', (275, inputbox.rect.h + 5), (295, 32),
-                          all_sprites)
-    inputbox_all_adress = InputBox(5, 415, 295, 32, '', 'dodgerblue2')
+    inputbox = InputBox(370, 5, 225, 24, 'left')
+    inputbox_all_adress = InputBox(5, 420, 225, 24, 'right', '', 'dodgerblue2')
     button = Button('Схема', (0, 0), (100, 100), all_sprites)
     map_type = button.get_text()
     screen.blit(img, (0, 0))
@@ -54,32 +49,22 @@ def main():
                         params['z'] -= 1
                         img = pg.image.load(get_image(params))
             if event.type == pg.MOUSEBUTTONDOWN:
-                if type_button.handle_click(event.pos):
-                    type_button.switch_text()
-                    type_button.draw()
-                    params['map_type'] = type_button.get_text()
-                    img = pg.image.load(get_image(params))
-                elif clear_button.handle_click(event.pos):
-                    if 'mark' in params.keys():
-                        del params['mark']
-                    inputbox.clear()
-                    if previous_coords and previous_z:
-                        params['coords'] = previous_coords
-                        params['z'] = previous_z
+                if button.handle_click(event.pos):
+                    button.switch_text()
+                    button.draw()
+                    params['map_type'] = button.get_text()
                     img = pg.image.load(get_image(params))
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
                 toponym = request
-                previous_coords = params['coords']
+                inputbox_all_adress.text_past(toponym['metaDataProperty']['GeocoderMetaData']['text'])
                 params['coords'] = extract_coords(toponym)
                 params['mark'] = {'coords': ','.join(map(str, params['coords'])),
                                   'type': 'pm2',
                                   'color': 'rd',
                                   'size': 'm'}
-                previous_z = params['z']
                 params['z'] = get_toponym_scale(toponym)
                 img = pg.image.load(get_image(params))
-                inputbox_all_adress.text_past(toponym['metaDataProperty']['GeocoderMetaData']['text'])
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
         for inp in inputboxs:
