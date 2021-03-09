@@ -1,10 +1,22 @@
 import os
 
 import pygame as pg
-
 from button import Button
 from textinput import InputBox
 from utils import get_image, extract_coords, get_toponym_scale
+
+
+def past_all_adress(inputbox_all_adress, toponym, post_index):
+    address = toponym['metaDataProperty']['GeocoderMetaData']['text']
+    if post_index:
+        try:
+            postal_code = \
+                toponym['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
+            inputbox_all_adress.text_past(f"{address} {str(postal_code)}")
+        except KeyError:
+            inputbox_all_adress.text_past(address)
+    else:
+        inputbox_all_adress.text_past(address)
 
 
 def main():
@@ -18,7 +30,9 @@ def main():
     inputbox = InputBox(370, 5, 225, 24, 'left')
     inputbox_all_adress = InputBox(5, 420, 225, 24, 'right', '', 'dodgerblue2')
     button = Button('Схема', (0, 0), (100, 100), all_sprites)
-    clear_button = Button('Сброс', (530, 45), (100, 100), all_sprites)
+    clear_button = Button('Сброс', (530, 45), (40, 30), all_sprites)
+    post_button = Button('Индекс', (445, 45), (70, 30), all_sprites)
+    post_index = False
     running = True
     clock = pg.time.Clock()
     fps = 60
@@ -59,10 +73,13 @@ def main():
                     button.draw()
                     params = {'coords': [43.574330, 43.389149], 'z': 2, 'map_type': 'map'}
                     img = pg.image.load(get_image(params))
+                if post_button.handle_click(event.pos):
+                    post_index = not post_index
+                    button.draw()
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
                 toponym = request
-                inputbox_all_adress.text_past(toponym['metaDataProperty']['GeocoderMetaData']['text'])
+                past_all_adress(inputbox_all_adress, toponym, post_index)
                 params['coords'] = extract_coords(toponym)
                 params['mark'] = {'coords': ','.join(map(str, params['coords'])),
                                   'type': 'pm2',
