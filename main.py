@@ -11,8 +11,8 @@ def past_all_adress(inputbox_all_adress, toponym, post_index):
     inputbox_all_adress.clear()
     if post_index:
         try:
-            postal_code = \
-                toponym['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
+            postal_code = (
+                toponym['metaDataProperty']['GeocoderMetaData']['Address']['postal_code'])
             inputbox_all_adress.text_past(f"{address} {str(postal_code)}")
         except KeyError:
             inputbox_all_adress.text_past(address)
@@ -30,9 +30,9 @@ def main():
     pg.display.set_icon(pg.image.load(os.path.join('data', 'img', 'yandex.png')))
     inputbox = InputBox(370, 5, 225, 24, 'left')
     inputbox_all_adress = InputBox(5, 420, 225, 24, 'right', '', 'dodgerblue2')
-    button = Button('Схема', (0, 0), (100, 100), all_sprites)
-    clear_button = Button('Сброс', (530, 45), (40, 30), all_sprites)
-    post_button = Button('Индекс', (445, 45), (70, 30), all_sprites)
+    button = Button('Схема', (0, 0), (65, 24), all_sprites)
+    clear_button = Button('Сброс', (530, 45), (65, 24), all_sprites)
+    post_button = Button('Индекс', (445, 45), (78, 24), all_sprites)
     post_index = False
     running = True
     clock = pg.time.Clock()
