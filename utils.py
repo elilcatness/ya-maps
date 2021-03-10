@@ -26,7 +26,7 @@ def get_image(params):
     return BytesIO(response.content)
 
 
-def get_geo_object(geocode: str):
+def get_geo_object(geocode):
     geocode_url = 'http://geocode-maps.yandex.ru/1.x/'
     geocode_error_msg = 'Не удалось найти объект на карте'
     response = requests.get(geocode_url, params={'geocode': geocode,

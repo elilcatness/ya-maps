@@ -1,9 +1,11 @@
+import json
 import os
 
 import pygame as pg
+
 from button import Button
 from textinput import InputBox
-from utils import get_image, extract_coords, get_toponym_scale
+from utils import get_image, extract_coords, get_toponym_scale, get_geo_object
 
 
 def past_all_adress(inputbox_all_adress, toponym, post_index):
@@ -25,6 +27,8 @@ def main():
     img = pg.image.load(get_image(params))
     pg.init()
     all_sprites = pg.sprite.Group()
+    width, height = 600, 450
+    center_x, center_y = width // 2, height // 2
     screen = pg.display.set_mode((600, 450))
     pg.display.set_caption('Яндекс.Карты')
     pg.display.set_icon(pg.image.load(os.path.join('data', 'img', 'yandex.png')))
@@ -69,17 +73,33 @@ def main():
                     button.draw()
                     params['map_type'] = button.get_text()
                     img = pg.image.load(get_image(params))
-                if clear_button.handle_click(event.pos):
+                elif clear_button.handle_click(event.pos):
                     for inp in inputboxs:
                         inp.clear()
                     button.draw()
                     params = {'coords': [43.574330, 43.389149], 'z': 2, 'map_type': 'map'}
                     img = pg.image.load(get_image(params))
-                if post_button.handle_click(event.pos):
+                elif post_button.handle_click(event.pos):
                     post_index = not post_index
                     if last_request:
                         past_all_adress(inputbox_all_adress, last_request, post_index)
                     button.draw()
+                else:
+                    if event.button == pg.BUTTON_LEFT:
+                        x, y = event.pos
+                        k = params['z'] * 100
+                        dx = (center_x - x) / k
+                        dy = (center_y - y) / k
+                        params['mark'] = {'coords': ','.join(map(str, (params['coords'][0] - dx,
+                                                                       params['coords'][1] + dy))),
+                                          'type': 'pm2',
+                                          'color': 'rd',
+                                          'size': 'm'}
+                        img = pg.image.load(get_image(params))
+                        last_request = get_geo_object(params['mark']['coords'])
+                        past_all_adress(inputbox_all_adress, last_request, post_index)
+                    elif event.button == pg.BUTTON_RIGHT:
+                        pass
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
                 last_request = request
