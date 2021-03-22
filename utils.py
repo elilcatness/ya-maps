@@ -31,7 +31,7 @@ def get_geo_object(geocode: str):
     response = requests.get(geocode_url, params={'geocode': geocode,
                                                  'format': 'json',
                                                  'results': 1,
-                                                 'apikey': os.environ['GEOCODE_APIKEY']})
+                                                 'apikey': os.getenv('GEOCODE_APIKEY')})
 
     if not response:
         request_error(response)
