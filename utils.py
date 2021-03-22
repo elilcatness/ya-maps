@@ -1,9 +1,8 @@
+import os
 import sys
 from io import BytesIO
 
 import requests
-
-from constants import GEOCODE_APIKEY
 
 
 def request_error(response):
@@ -32,7 +31,7 @@ def get_geo_object(geocode: str):
     response = requests.get(geocode_url, params={'geocode': geocode,
                                                  'format': 'json',
                                                  'results': 1,
-                                                 'apikey': GEOCODE_APIKEY})
+                                                 'apikey': os.environ['GEOCODE_APIKEY']})
 
     if not response:
         request_error(response)

@@ -6,7 +6,7 @@ from textinput import InputBox
 from utils import get_image, extract_coords, get_toponym_scale
 
 
-def past_all_adress(inputbox_all_adress, toponym, post_index):
+def past_all_address(inputbox_all_adress, toponym, post_index):
     address = toponym['metaDataProperty']['GeocoderMetaData']['text']
     inputbox_all_adress.clear()
     if post_index:
@@ -37,7 +37,7 @@ def main():
     running = True
     clock = pg.time.Clock()
     fps = 60
-    inputboxs = [inputbox, inputbox_all_adress]
+    inputboxes = [inputbox, inputbox_all_adress]
     last_request = None
     while running:
         for event in pg.event.get():
@@ -70,7 +70,7 @@ def main():
                     params['map_type'] = button.get_text()
                     img = pg.image.load(get_image(params))
                 if clear_button.handle_click(event.pos):
-                    for inp in inputboxs:
+                    for inp in inputboxes:
                         inp.clear()
                     button.draw()
                     params = {'coords': [43.574330, 43.389149], 'z': 2, 'map_type': 'map'}
@@ -78,13 +78,13 @@ def main():
                 if post_button.handle_click(event.pos):
                     post_index = not post_index
                     if last_request:
-                        past_all_adress(inputbox_all_adress, last_request, post_index)
+                        past_all_address(inputbox_all_adress, last_request, post_index)
                     button.draw()
             request = inputbox.handle_event(event)
             if request and isinstance(request, dict):
                 last_request = request
                 toponym = request
-                past_all_adress(inputbox_all_adress, toponym, post_index)
+                past_all_address(inputbox_all_adress, toponym, post_index)
                 params['coords'] = extract_coords(toponym)
                 params['mark'] = {'coords': ','.join(map(str, params['coords'])),
                                   'type': 'pm2',
@@ -94,7 +94,7 @@ def main():
                 img = pg.image.load(get_image(params))
         screen.blit(img, (0, 0))
         all_sprites.draw(screen)
-        for inp in inputboxs:
+        for inp in inputboxes:
             inp.update()
             inp.draw(screen)
         pg.display.flip()
