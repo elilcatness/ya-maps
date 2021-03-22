@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 
 import pygame as pg
 from button import Button
@@ -103,4 +104,5 @@ def main():
 
 
 if __name__ == '__main__':
+    load_dotenv()
     main()
